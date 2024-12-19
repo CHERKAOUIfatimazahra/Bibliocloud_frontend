@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
   const auth = useAuth();
@@ -29,6 +30,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route
             path="/dashboard"
             element={
