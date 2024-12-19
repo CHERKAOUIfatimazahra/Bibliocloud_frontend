@@ -9,12 +9,14 @@ import {
   BookOpen,
   User,
   LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 
 const Navbar = () => {
   const auth = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const signOutRedirect = () => {
     auth.removeUser();
@@ -27,6 +29,16 @@ const Navbar = () => {
     )}`;
   };
 
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
@@ -35,25 +47,29 @@ const Navbar = () => {
   // Active link styles
   const getLinkStyles = (path) => {
     const isActive = location.pathname === path;
-    return `flex items-center px-3 py-2 rounded-md text-sm font-medium transition duration-300 
+    return `flex items-center px-3 py-2 rounded-xl text-sm font-medium transition duration-300 
       ${
         isActive
-          ? "bg-emerald-700 text-white"
-          : "hover:bg-emerald-700/80 hover:text-white text-emerald-50"
+          ? "bg-blue-600 text-white"
+          : "hover:bg-blue-50 hover:text-blue-600 text-gray-700"
       }`;
   };
 
   return (
-    <nav className="bg-emerald-800 shadow-lg w-full z-50">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white/90 backdrop-blur-md shadow-md" : "bg-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Book className="h-8 w-8 mr-2 text-emerald-400" />
+              <Book className="h-8 w-8 mr-2 text-blue-600" />
               <Link
                 to="/"
-                className="font-serif text-2xl text-white hover:text-emerald-200 transition duration-300"
+                className="font-bold text-2xl text-gray-800 hover:text-blue-600 transition duration-300"
               >
                 BiblioCloud
               </Link>
@@ -62,7 +78,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-4">
+            <div className="ml-10 flex items-center space-x-2">
               <Link to="/catalog" className={getLinkStyles("/catalog")}>
                 <BookOpen className="h-4 w-4 mr-2" />
                 Catalogue
@@ -76,13 +92,13 @@ const Navbar = () => {
               {!auth.isAuthenticated ? (
                 <button
                   onClick={() => auth.signinRedirect()}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center shadow-sm hover:shadow-md"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center shadow-md hover:shadow-lg"
                 >
                   <User className="h-4 w-4 mr-2" />
                   Se connecter
                 </button>
               ) : (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <Link to="/profile" className={getLinkStyles("/profile")}>
                     <User className="h-4 w-4 mr-2" />
                     Mon Compte
@@ -95,8 +111,9 @@ const Navbar = () => {
 
                   <button
                     onClick={signOutRedirect}
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center shadow-sm hover:shadow-md"
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center shadow-md hover:shadow-lg"
                   >
+                    <LogOut className="h-4 w-4 mr-2" />
                     Déconnexion
                   </button>
                 </div>
@@ -108,7 +125,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-emerald-200 hover:text-white hover:bg-emerald-700 focus:outline-none transition duration-300"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-blue-50 focus:outline-none transition duration-300"
               aria-expanded={isMenuOpen}
             >
               <span className="sr-only">Menu principal</span>
@@ -124,23 +141,23 @@ const Navbar = () => {
 
       {/* Mobile Menu with animation */}
       <div
-        className={`md:hidden transition-all duration-300 transform ${
+        className={`md:hidden absolute w-full transition-all duration-300 transform ${
           isMenuOpen
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0"
         }`}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-emerald-700 shadow-lg">
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg rounded-b-xl">
           <Link
             to="/catalog"
-            className="flex items-center text-white hover:bg-emerald-600 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+            className="flex items-center hover:bg-blue-50 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-xl text-base font-medium transition duration-300"
           >
             <BookOpen className="h-5 w-5 mr-3" />
             Catalogue
           </Link>
           <Link
             to="/search"
-            className="flex items-center text-white hover:bg-emerald-600 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+            className="flex items-center hover:bg-blue-50 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-xl text-base font-medium transition duration-300"
           >
             <Search className="h-5 w-5 mr-3" />
             Rechercher
@@ -149,7 +166,7 @@ const Navbar = () => {
           {!auth.isAuthenticated ? (
             <button
               onClick={() => auth.signinRedirect()}
-              className="w-full text-left bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-md text-base font-medium flex items-center transition duration-300"
+              className="w-full text-left bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-base font-medium flex items-center transition duration-300"
             >
               <User className="h-5 w-5 mr-3" />
               Se connecter
@@ -158,22 +175,23 @@ const Navbar = () => {
             <>
               <Link
                 to="/profile"
-                className="flex items-center text-white hover:bg-emerald-600 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+                className="flex items-center hover:bg-blue-50 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-xl text-base font-medium transition duration-300"
               >
                 <User className="h-5 w-5 mr-3" />
                 Mon Compte
               </Link>
               <Link
                 to="/dashboard"
-                className="flex items-center text-white hover:bg-emerald-600 px-3 py-2 rounded-md text-base font-medium transition duration-300"
+                className="flex items-center hover:bg-blue-50 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-xl text-base font-medium transition duration-300"
               >
                 <LayoutDashboard className="h-5 w-5 mr-3" />
                 Dashboard
               </Link>
               <button
                 onClick={signOutRedirect}
-                className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-base font-medium flex items-center transition duration-300"
+                className="w-full text-left bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-base font-medium flex items-center transition duration-300"
               >
+                <LogOut className="h-5 w-5 mr-3" />
                 Déconnexion
               </button>
             </>
