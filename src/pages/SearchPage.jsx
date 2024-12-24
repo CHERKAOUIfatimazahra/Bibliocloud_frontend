@@ -10,79 +10,94 @@ import {
   Heart,
   X,
 } from "lucide-react";
-import axios from "axios";
 
 const SearchPage = () => {
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [error, setErreur] = useState();
-
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/book");
-        setBooks(response.data);
-      } catch (error) {
-        setErreur(error.message);
-      }
-    };
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/category");
-        setCategories(response.data);
-      } catch (error) {
-        setErreur(error.message);
-      }
-    };
-    fetchBooks();
-    fetchCategories();
-  }, []);
-
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [favorites, setFavorites] = useState([]);
+  // const [favorites, setFavorites] = useState([]);
   const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
   const booksPerPage = 6;
 
-  // Toggle favorite books
-  const toggleFavorite = (bookId) => {
-    setFavorites((prev) =>
-      prev.includes(bookId)
-        ? prev.filter((id) => id !== bookId)
-        : [...prev, bookId]
-    );
-  };
+  // Fetch data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [booksResponse, categoriesResponse] = await Promise.all([
+          fetch("http://localhost:3000/book"),
+          fetch("http://localhost:3000/category"),
+        ]);
 
-  // Toggle category selection
-  const toggleCategory = (category) => {
+        if (!booksResponse.ok || !categoriesResponse.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const booksData = await booksResponse.json();
+        const categoriesData = await categoriesResponse.json();
+
+        setBooks(booksData);
+        setCategories(categoriesData);
+      } catch (error) {
+        setError(error.message);
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Reset page when search terms or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategories]);
+
+  const toggleCategory = (categoryId) => {
     setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
     );
   };
 
-  // Filtering and pagination
-  const filteredBooks = books.filter(
-    (book) =>
-      (selectedCategories.length === 0 ||
-        selectedCategories.includes(book.category)) &&
-      (book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.tags.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        ))
-  );
+  // Improved search and filter logic
+  const filteredBooks = books.filter((book) => {
+    const matchesSearch =
+      searchTerm === "" ||
+      book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.author?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategories =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(book.categoryId);
+
+    return matchesSearch && matchesCategories;
+  });
 
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
-
   const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
 
-  // Pagination
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategories([]);
+    setAdvancedFiltersOpen(false);
+    setCurrentPage(1);
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-8 bg-red-50 rounded-xl">
+          <h2 className="text-2xl text-red-600 mb-4">Error</h2>
+          <p className="text-red-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-16">
@@ -97,7 +112,7 @@ const SearchPage = () => {
             catégorie ou tags pour trouver votre prochaine lecture.
           </p>
 
-          {/* Search Bar with Advanced Filters */}
+          {/* Search Bar */}
           <div className="max-w-4xl mx-auto relative">
             <div className="flex">
               <div className="relative flex-grow">
@@ -118,54 +133,50 @@ const SearchPage = () => {
               </button>
             </div>
 
-            {/* Advanced Filters Dropdown */}
+            {/* Advanced Filters */}
             {advancedFiltersOpen && (
               <div className="mt-4 p-6 bg-white rounded-xl shadow-lg">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                  Filtres Avancés
-                </h3>
+                <div className="flex justify-between items-center mb-4">
+                  <button
+                    onClick={() => setAdvancedFiltersOpen(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
 
-                {/* Category Filters */}
+                {/* Categories */}
                 <div className="mb-6">
                   <h4 className="font-medium mb-3 text-gray-700">Catégories</h4>
                   <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => {
-                      const isSelected = selectedCategories.includes(
-                        category.name
-                      );
-                      return (
-                        <button
-                          key={category.name}
-                          onClick={() => toggleCategory(category.name)}
-                          className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition ${
-                            isSelected
-                              ? "bg-blue-100 text-blue-800 ring-2 ring-offset-2"
-                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                          }`}
-                        >
-                          <BookOpen className="w-4 h-4" />
-                          <span>{category.name}</span>
-                          {isSelected && <X className="w-4 h-4 ml-2" />}
-                        </button>
-                      );
-                    })}
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => toggleCategory(category.id)}
+                        className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition ${
+                          selectedCategories.includes(category.id)
+                            ? "bg-blue-100 text-blue-800 ring-2 ring-blue-500 ring-offset-2"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        <span>{category.name}</span>
+                        {selectedCategories.includes(category.id) && (
+                          <X className="w-4 h-4 ml-2" />
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {/* Clear Filters Button */}
+                {/* Clear Filters */}
                 {(selectedCategories.length > 0 || searchTerm) && (
-                  <div className="mt-4">
-                    <button
-                      onClick={() => {
-                        setSelectedCategories([]);
-                        setSearchTerm("");
-                        setAdvancedFiltersOpen(false);
-                      }}
-                      className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition"
-                    >
-                      Réinitialiser les filtres
-                    </button>
-                  </div>
+                  <button
+                    onClick={clearFilters}
+                    className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition"
+                  >
+                    Réinitialiser les filtres
+                  </button>
                 )}
               </div>
             )}
@@ -173,11 +184,12 @@ const SearchPage = () => {
         </div>
       </section>
 
-      {/* Search Results Section */}
+      {/* Results */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           {filteredBooks.length > 0 ? (
             <>
+              {/* Book grid */}
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
                 {currentBooks.map((book) => (
                   <div
@@ -186,14 +198,11 @@ const SearchPage = () => {
                   >
                     <div className="relative">
                       <img
-                        src={
-                          book.image ||
-                          "https://t4.ftcdn.net/jpg/07/18/45/41/360_F_718454107_bllWMfUzftPuzsD44xb6m757Tssh8P33.jpg"
-                        }
+                        src={book.image || "/api/placeholder/400/320"}
                         alt={book.title}
                         className="w-full h-64 object-cover"
                       />
-                      <button
+                      {/* <button
                         onClick={() => toggleFavorite(book.id)}
                         className="absolute top-4 right-4 bg-white/70 p-2 rounded-full hover:bg-white transition"
                       >
@@ -204,18 +213,13 @@ const SearchPage = () => {
                               : "text-gray-500"
                           }`}
                         />
-                      </button>
+                      </button> */}
                     </div>
                     <div className="p-6 space-y-3">
                       <div className="flex justify-between items-center">
-                        <span
-                          className={`text-sm font-medium ${
-                            categories.find((c) => c.id === book.categoryId)
-                              ?.color || "bg-blue-50 text-blue-600"
-                          } px-3 py-1 rounded-full`}
-                        >
+                        <span className="text-sm font-medium bg-blue-50 text-blue-600 px-3 py-1 rounded-full">
                           {categories.find((c) => c.id === book.categoryId)
-                            ?.name || "Unknown Category"}
+                            ?.name || "Unknown"}
                         </span>
                         <div className="flex items-center text-yellow-500">
                           <Star className="h-4 w-4 mr-1" />
@@ -243,35 +247,41 @@ const SearchPage = () => {
               </div>
 
               {/* Pagination */}
-              <div className="flex justify-center mt-12 space-x-2">
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="bg-gray-200 p-3 rounded-xl disabled:opacity-50 hover:bg-gray-300 transition"
-                >
-                  <ChevronLeft />
-                </button>
-                {[...Array(totalPages)].map((_, index) => (
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-12 space-x-2">
                   <button
-                    key={index}
-                    onClick={() => paginate(index + 1)}
-                    className={`px-4 py-2 rounded-xl transition ${
-                      currentPage === index + 1
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    }`}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="bg-gray-200 p-3 rounded-xl disabled:opacity-50 hover:bg-gray-300 transition"
                   >
-                    {index + 1}
+                    <ChevronLeft />
                   </button>
-                ))}
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="bg-gray-200 p-3 rounded-xl disabled:opacity-50 hover:bg-gray-300 transition"
-                >
-                  <ChevronRight />
-                </button>
-              </div>
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentPage(index + 1)}
+                      className={`px-4 py-2 rounded-xl transition ${
+                        currentPage === index + 1
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="bg-gray-200 p-3 rounded-xl disabled:opacity-50 hover:bg-gray-300 transition"
+                  >
+                    <ChevronRight />
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             <div className="text-center py-12 bg-white rounded-xl shadow-lg">
