@@ -10,7 +10,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Dashboard from "./pages/Dashboard";
+import BookDashboard from "./pages/book/BookDashboard.jsx";
 import SearchPage from "./pages/SearchPage";
 
 function App() {
@@ -27,15 +27,15 @@ function App() {
   return (
     <Router>
       <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<SearchPage />} />
           <Route
-            path="/dashboard"
+            path="/bookDashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <BookDashboard />
               </ProtectedRoute>
             }
           />
