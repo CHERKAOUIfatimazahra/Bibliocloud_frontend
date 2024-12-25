@@ -12,6 +12,8 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BookDashboard from "./pages/book/BookDashboard.jsx";
 import SearchPage from "./pages/SearchPage";
+import AddBook from "./pages/book/AddBook.jsx";
+import UpdateBook from "./pages/book/UpdateBook.jsx";
 
 function App() {
   const auth = useAuth();
@@ -27,7 +29,7 @@ function App() {
   return (
     <Router>
       <div>
-        {/* <Navbar /> */}
+        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<SearchPage />} />
@@ -36,6 +38,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <BookDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/addbook"
+            element={
+              <ProtectedRoute>
+                <AddBook />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-book/:bookId"
+            element={
+              <ProtectedRoute>
+                <UpdateBook />
               </ProtectedRoute>
             }
           />
