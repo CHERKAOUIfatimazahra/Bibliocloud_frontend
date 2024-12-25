@@ -104,7 +104,10 @@ const Navbar = () => {
                     Mon Compte
                   </Link>
 
-                  <Link to="/dashboard" className={getLinkStyles("/dashboard")}>
+                  <Link
+                    to="/bookDashboard"
+                    className={getLinkStyles("/dashboard")}
+                  >
                     <LayoutDashboard className="h-4 w-4 mr-2" />
                     Dashboard
                   </Link>
