@@ -10,6 +10,7 @@ import {
   Heart,
   X,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const SearchPage = () => {
   const [books, setBooks] = useState([]);
@@ -234,9 +235,12 @@ const SearchPage = () => {
                         {book.description}
                       </p>
                       <div className="flex space-x-2 mt-4">
-                        <button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl hover:scale-105 transition transform">
+                        <Link
+                          to={`/book/${book.id}`}
+                          className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl hover:scale-105 transition transform"
+                        >
                           Emprunter
-                        </button>
+                        </Link>
                         <button className="bg-gray-200 text-gray-800 p-3 rounded-xl hover:bg-gray-300 transition">
                           <BookmarkPlus className="w-5 h-5" />
                         </button>
