@@ -17,6 +17,7 @@ import UpdateBook from "./pages/book/UpdateBook.jsx";
 import CategoryDashboard from "./pages/categories/CategoryDashboard.jsx";
 import AddCategories from "./pages/categories/AddCategories.jsx";
 import UpdateCategories from "./pages/categories/UpdateCategories.jsx";
+import BookDetailPage from "./pages/BookDetailPage";
 
 function App() {
   const auth = useAuth();
@@ -36,6 +37,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/book/:bookId" element={<BookDetailPage />} />
           <Route
             path="/bookDashboard"
             element={
