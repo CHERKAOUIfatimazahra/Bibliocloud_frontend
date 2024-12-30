@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 import { Calendar, User, BookOpen, Star } from "lucide-react";
 import { format, addDays, startOfDay } from "date-fns";
+import axios from "axios";
 
 const BookDetailPage = () => {
   const [book, setBook] = useState(null);
@@ -37,53 +38,27 @@ const BookDetailPage = () => {
     setShowModal(true);
   };
 
- const handleLoanSubmit = async () => {
-   setIsLoading(true);
+  const handleLoanSubmit = async () => {
+    setIsLoading(true);
 
-   try {
-     // S'assurer que la date de retour et la date d'emprunt sont correctement formatées
-     const dateEmprunt = startOfDay(new Date()); // Début de la journée actuelle
-     const formattedReturnDate = startOfDay(returnDate);
-
-     // Vérifier que la date de retour est valide
-     if (formattedReturnDate <= dateEmprunt) {
-       throw new Error(
-         "La date de retour doit être postérieure à la date d'emprunt."
-       );
-     }
-
-     const response = await fetch("http://localhost:3000/emprunts", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-         Authorization: `Bearer ${auth.user?.access_token}`,
-       },
-       body: JSON.stringify({
-         userId: auth.user?.profile.sub,
-         bookId: id,
-         dateEmprunt: format(dateEmprunt, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
-         dateRetour: format(
-           formattedReturnDate,
-           "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-         ),
-       }),
-     });
-
-     if (!response.ok) {
-       const errorData = await response.json();
-       throw new Error(errorData.message || "Échec de l'emprunt.");
-     }
-
-     setShowModal(false);
-     alert("Livre emprunté avec succès !");
-   } catch (error) {
-     setError(error.message);
-     alert(error.message);
-   } finally {
-     setIsLoading(false);
-   }
- };
-
+    try {
+      const responce = axios.post("http://localhost:3000/emprunts", {
+        bookId: book.id,
+        userId: auth.user.profile.sub,
+        returnDate: startOfDay(returnDate).toISOString(),
+      });
+      if (responce.status === 201) {
+        navigate("/Search");
+      }
+      setShowModal(false);
+      alert(responce.data.message);
+    } catch (error) {
+      setError(error.message);
+      alert(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (error) {
     return (
