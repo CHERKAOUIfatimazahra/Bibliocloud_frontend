@@ -17,7 +17,7 @@ const UpdateCategory = () => {
     const fetchCategory = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/category/${categoryId}`
+          `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category/${categoryId}`
         );
         if (!response.ok) throw new Error("Failed to fetch category details");
 
@@ -41,7 +41,7 @@ const UpdateCategory = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/category/${categoryId}`,
+        `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category/${categoryId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
