@@ -24,8 +24,12 @@ const BookDashboard = () => {
     const fetchData = async () => {
       try {
         const [booksResponse, categoriesResponse] = await Promise.all([
-          fetch("http://localhost:3000/book"),
-          fetch("http://localhost:3000/category"),
+          fetch(
+            "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book"
+          ),
+          fetch(
+            "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category"
+          ),
         ]);
         const booksData = await booksResponse.json();
         const categoriesData = await categoriesResponse.json();
@@ -51,9 +55,12 @@ const BookDashboard = () => {
 
   const handleDelete = async (bookId) => {
     try {
-      const response = await fetch(`http://localhost:3000/book/${bookId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book/${bookId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         // Remove the book from the state after successful deletion
