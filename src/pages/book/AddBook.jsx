@@ -17,7 +17,7 @@ const AddBook = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3000/category")
+    fetch("https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category")
       .then((res) => res.json())
       .then(setCategories)
       .catch(() => setError("Failed to load categories"));
@@ -29,11 +29,14 @@ const AddBook = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3000/book", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to create book");
       navigate("/BookDashboard");
