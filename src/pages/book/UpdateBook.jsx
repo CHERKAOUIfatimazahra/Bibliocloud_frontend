@@ -22,13 +22,15 @@ const UpdateBook = () => {
     const fetchData = async () => {
       try {
         // Fetch categories
-        const categoryResponse = await fetch("http://localhost:3000/category");
+        const categoryResponse = await fetch(
+          "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category"
+        );
         const categoryData = await categoryResponse.json();
         setCategories(categoryData);
 
         // Fetch book details
         const bookResponse = await fetch(
-          `http://localhost:3000/book/${bookId}`
+          `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book/${bookId}`
         );
         if (!bookResponse.ok) throw new Error("Failed to fetch book details");
         const bookData = await bookResponse.json();
@@ -55,11 +57,14 @@ const UpdateBook = () => {
     setError("");
 
     try {
-      const response = await fetch(`http://localhost:3000/book/${bookId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book/${bookId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to update book");
       navigate("/BookDashboard");
