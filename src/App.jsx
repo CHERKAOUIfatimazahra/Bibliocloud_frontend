@@ -17,7 +17,7 @@ import UpdateBook from "./pages/book/UpdateBook.jsx";
 import CategoryDashboard from "./pages/categories/CategoryDashboard.jsx";
 import AddCategories from "./pages/categories/AddCategories.jsx";
 import UpdateCategories from "./pages/categories/UpdateCategories.jsx";
-import BookDetailPage from "./pages/BookDetailPage";
+import BookDetailPage from "./pages/emprunt/BookDetailPage";
 
 function App() {
   const auth = useAuth();
