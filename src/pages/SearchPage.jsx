@@ -28,8 +28,12 @@ const SearchPage = () => {
     const fetchData = async () => {
       try {
         const [booksResponse, categoriesResponse] = await Promise.all([
-          fetch("http://localhost:3000/book"),
-          fetch("http://localhost:3000/category"),
+          fetch(
+            "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book"
+          ),
+          fetch(
+            "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category"
+          ),
         ]);
 
         if (!booksResponse.ok || !categoriesResponse.ok) {
