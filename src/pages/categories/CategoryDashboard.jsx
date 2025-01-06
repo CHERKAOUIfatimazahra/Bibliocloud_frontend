@@ -21,9 +21,7 @@ const CategoryDashboard = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(
-          "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category"
-        );
+        const response = await fetch(import.meta.env.VITE_API + "/category");
         const data = await response.json();
         setCategories(data);
       } catch (error) {
@@ -43,7 +41,7 @@ const CategoryDashboard = () => {
   const handleDelete = async (categoryId) => {
     try {
       const response = await fetch(
-        `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category/${categoryId}`,
+        import.meta.env.VITE_API + `/category/${categoryId}`,
         {
           method: "DELETE",
         }

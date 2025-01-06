@@ -18,9 +18,7 @@ const BookDetailPage = () => {
   useEffect(() => {
     const fetchBookDetail = async () => {
       try {
-        const response = await fetch(
-          `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book/${id}`
-        );
+        const response = await fetch(import.meta.env.VITE_API + `/book/${id}`);
         if (!response.ok) throw new Error("Failed to fetch book details");
         const data = await response.json();
         setBook(data);
@@ -44,14 +42,11 @@ const BookDetailPage = () => {
     setIsLoading(true);
 
     try {
-      const responce = axios.post(
-        "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/emprunts",
-        {
-          bookId: book.id,
-          userId: auth.user.profile.sub,
-          returnDate: startOfDay(returnDate).toISOString(),
-        }
-      );
+      const responce = axios.post(import.meta.env.VITE_API + "/emprunts", {
+        bookId: book.id,
+        userId: auth.user.profile.sub,
+        returnDate: startOfDay(returnDate).toISOString(),
+      });
       if (responce.status === 201) {
         navigate("/Search");
       }

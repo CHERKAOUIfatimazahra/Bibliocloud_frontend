@@ -23,14 +23,14 @@ const UpdateBook = () => {
       try {
         // Fetch categories
         const categoryResponse = await fetch(
-          "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category"
+          import.meta.env.VITE_API + "/category"
         );
         const categoryData = await categoryResponse.json();
         setCategories(categoryData);
 
         // Fetch book details
         const bookResponse = await fetch(
-          `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book/${bookId}`
+          import.meta.env.VITE_API + `/book/${bookId}`
         );
         if (!bookResponse.ok) throw new Error("Failed to fetch book details");
         const bookData = await bookResponse.json();
@@ -58,7 +58,7 @@ const UpdateBook = () => {
 
     try {
       const response = await fetch(
-        `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book/${bookId}`,
+        import.meta.env.VITE_API + `/book/${bookId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

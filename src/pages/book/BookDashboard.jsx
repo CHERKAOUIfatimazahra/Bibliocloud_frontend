@@ -24,12 +24,8 @@ const BookDashboard = () => {
     const fetchData = async () => {
       try {
         const [booksResponse, categoriesResponse] = await Promise.all([
-          fetch(
-            "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book"
-          ),
-          fetch(
-            "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category"
-          ),
+          fetch(import.meta.env.VITE_API + "/book"),
+          fetch(import.meta.env.VITE_API + "/category"),
         ]);
         const booksData = await booksResponse.json();
         const categoriesData = await categoriesResponse.json();
@@ -56,7 +52,7 @@ const BookDashboard = () => {
   const handleDelete = async (bookId) => {
     try {
       const response = await fetch(
-        `https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/book/${bookId}`,
+        import.meta.env.VITE_API + `/book/${bookId}`,
         {
           method: "DELETE",
         }

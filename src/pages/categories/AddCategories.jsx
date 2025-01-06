@@ -17,14 +17,11 @@ const AddCategories = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://7idbofutgi.execute-api.eu-north-1.amazonaws.com/v1/category",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(import.meta.env.VITE_API + "/category", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) throw new Error("Failed to create category");
       navigate("/CategoryDashboard");
